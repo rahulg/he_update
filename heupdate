@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# START CONFIG #
+
+HE_TUN_ID="000000"
+HE_USER="username"
+HE_PASS="password"
+LOG_FILE="./heupdate.log"
+
+#  END CONFIG  #
+
+
+HE_UPD_URI="https://ipv4.tunnelbroker.net/nic/update?username=${HE_USER}&password=${HE_PASS}&hostname=${HE_TUN_ID}"
+
+rm -f "${LOG_FILE}" 2>/dev/null
+date > "${LOG_FILE}"
+curl "${HE_UPD_URI}" >> "${LOG_FILE}"
+
