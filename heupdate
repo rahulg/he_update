@@ -2,17 +2,27 @@
 
 # START CONFIG #
 
-HE_TUN_ID="000000"
-HE_USER="username"
-HE_PASS="password"
-LOG_FILE="./heupdate.log"
+HE_TUN_ID="TUNNEL_ID"
+HE_USER="USERNAME"
+HE_PASS="PASSWORD"
+LOG_FILE="/var/log/heupdate.log"
+
+SYSADM="YOUR_EMAIL"
+SUBJECT="IPv6 Tunnel Update"
 
 #  END CONFIG  #
 
-
+TEMP_LOG="/tmp/heupdate.log"
 HE_UPD_URI="https://ipv4.tunnelbroker.net/nic/update?username=${HE_USER}&password=${HE_PASS}&hostname=${HE_TUN_ID}"
 
 rm -f "${LOG_FILE}" 2>/dev/null
-date > "${LOG_FILE}"
-curl "${HE_UPD_URI}" >> "${LOG_FILE}"
+echo -n "Updated on: " > "${LOG_FILE}"
+date >> "${LOG_FILE}"
+curl --silent "${HE_UPD_URI}" | tee "${TEMP_LOG}" >> "${LOG_FILE}"
 
+TUN_STATUS=`cat "${TEMP_LOG}" | cut -f 1 -d " "`
+if [ "$TUN_STATUS" == "good" ]
+then
+	# email log
+	mail -s "${SUBJECT}" "${SYSADM}" < "${LOG_FILE}"
+fi
